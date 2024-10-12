@@ -17,4 +17,11 @@ export class AppService implements OnModuleInit {
       timestamp: new Date(),
     });
   }
+
+  async pushMessage(message: string) {
+    this.eventEmitter.emit('sse.event', {
+      message: message,
+      timestamp: new Date(),
+    });
+  }
 }

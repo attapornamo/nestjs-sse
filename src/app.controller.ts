@@ -1,4 +1,4 @@
-import { Controller, Sse, MessageEvent } from '@nestjs/common';
+import { Controller, Sse, MessageEvent, Post, Body } from '@nestjs/common';
 import { AppService } from './app.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Observable, fromEvent, map } from 'rxjs';
@@ -17,5 +17,11 @@ export class AppController {
         data: JSON.stringify(payload),
       })),
     );
+  }
+
+  @Post('push-message')
+  async pushMesssage(@Body() data: any) {
+    await this.appService.pushMessage(data.message);
+    return 'success';
   }
 }
