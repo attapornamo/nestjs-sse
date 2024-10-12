@@ -5,23 +5,24 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 export class AppService implements OnModuleInit {
   constructor(private eventEmitter: EventEmitter2) {}
 
+  private sseInterval: NodeJS.Timeout;
+
   onModuleInit() {
-    setInterval(async () => {
-      this.sse();
-    }, 3000);
+    this.sseInterval = setInterval(() => this.sse('sync-data'), 5000);
   }
 
-  async sse() {
-    this.eventEmitter.emit('sse.event', {
+  async onModuleDestroy() {
+    clearInterval(this.sseInterval);
+  }
+
+  sse(topic: string) {
+    this.eventEmitter.emit(topic, {
       message: 'You have new notification',
-      timestamp: new Date(),
+      timestamp: Date.now(),
     });
   }
 
-  async pushMessage(message: string) {
-    this.eventEmitter.emit('sse.event', {
-      message: message,
-      timestamp: new Date(),
-    });
+  pushMessage(topic: string, message: string) {
+    this.eventEmitter.emit(topic, { message, timestamp: Date.now() });
   }
 }

@@ -1,7 +1,14 @@
-import { Controller, Sse, MessageEvent, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Sse,
+  MessageEvent,
+  Post,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Observable, fromEvent, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Controller()
 export class AppController {
@@ -10,18 +17,22 @@ export class AppController {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  @Sse('/notification')
-  async sse(): Promise<Observable<MessageEvent>> {
-    return fromEvent(this.eventEmitter, 'sse.event').pipe(
-      map((payload) => ({
-        data: JSON.stringify(payload),
-      })),
-    );
+  @Sse('/notification/:topic')
+  sse(@Param('topic') topic: string): Observable<MessageEvent> {
+    return new Observable((observer) => {
+      const eventHandler = (payload: unknown) => {
+        observer.next({ data: JSON.stringify(payload) });
+      };
+      this.eventEmitter.on(topic, eventHandler);
+      return () => this.eventEmitter.off(topic, eventHandler);
+    });
   }
 
   @Post('push-message')
-  async pushMesssage(@Body() data: any) {
-    await this.appService.pushMessage(data.message);
-    return 'success';
+  async pushMesssage(
+    @Body() { topic, message }: { topic: string; message: string },
+  ) {
+    this.eventEmitter.emit(topic, { message, timestamp: new Date() });
+    return 'Push message to ' + topic + ' success.';
   }
 }
