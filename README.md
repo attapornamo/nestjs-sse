@@ -5,9 +5,9 @@ Server-Sent Events (SSE) is a server push technology enabling a client to receiv
 ## Installation
 
 ```bash
-$ npm i
+$ npm install
 
-$ npm i --save @nestjs/event-emitter # for the event emitter
+$ npm install --save @nestjs/event-emitter # for the event emitter
 ```
 
 ## Running the app
