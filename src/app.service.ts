@@ -15,14 +15,14 @@ export class AppService implements OnModuleInit {
     clearInterval(this.sseInterval);
   }
 
-  sse(topic: string) {
-    this.eventEmitter.emit(topic, {
+  sse(event: string) {
+    this.eventEmitter.emit(event, {
       message: 'You have new notification',
       timestamp: Date.now(),
     });
   }
 
-  pushMessage(topic: string, message: string) {
-    this.eventEmitter.emit(topic, { message, timestamp: Date.now() });
+  pushMessage(event: string, message: string) {
+    this.eventEmitter.emit(event, { message, timestamp: Date.now() });
   }
 }
